@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego de Unir Columnas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+    }
+    h1 { color: #004080; margin: 15px; }
+    .container {
+      display: flex; justify-content: center; flex-wrap: wrap; margin: 20px;
+    }
+    .column { margin: 10px; flex: 1; min-width: 150px; }
+    .item {
+      padding: 15px; margin: 8px; border: 2px solid #004080;
+      border-radius: 10px; cursor: pointer; background: #ffffff;
+      font-size: 18px; transition: 0.3s;
+    }
+    .item:hover { background: #e6f2ff; }
+    .selected { background-color: #cce5ff; border-color: #3399ff; }
+    .correct { background-color: #a8e6a1; border-color: #2e8b57; color: #004d00; }
+    .wrong { background-color: #f5a1a1; border-color: #b22222; color: #660000; }
+    #info { margin: 20px; font-size: 20px; color: #004080; }
+    #info span { font-weight: bold; }
+    @media (max-width: 600px) {
+      .item { font-size: 20px; padding: 20px; }
+    }
+    /* Estilos para el modal */
+    .modal {
+      display: none; position: fixed; z-index: 1; left: 0; top: 0;
+      width: 100%; height: 100%; overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff; margin: 15% auto; padding: 20px;
+      border: 2px solid #004080; width: 80%; max-width: 400px;
+      border-radius: 10px; text-align: center;
+    }
+    .modal-content h2 { color: #004080; }
+    .modal-content button {
+      margin: 10px; padding: 10px 20px; font-size: 16px;
+      border: none; border-radius: 5px; cursor: pointer;
+    }
+    .btn-restart { background-color: #4CAF50; color: white; }
+    .btn-exit { background-color: #f44336; color: white; }
+  </style>
+</head>
+<body>
+  <h1>🎮 Juego: Une las columnas</h1>
+  <p>Haz clic en una opción de la izquierda y luego en la que creas que corresponde a la derecha.</p>
+
+  <div class="container" id="game">
+    <div class="column" id="col1">
+      <h2>Corregimiento</h2>
+      <div class="item" data-match="1">Cimarronas</div>
+      <div class="item" data-match="2">San Juan</div>
+      <div class="item" data-match="3">El Cármen</div>
+      <div class="item" data-match="4">Los Milagros</div>
+    </div>
+    <div class="column" id="col2">
+      <h2>Fiesta Patronal</h2>
+      <div class="item" data-match="4">Vírgen de las Mercedes</div>
+      <div class="item" data-match="3">Vírgen del Cármen</div>
+      <div class="item" data-match="1">Vírgen de Fátima</div>
+      <div class="item" data-match="2">Nuestra Señora de los Remedios</div>
+    </div>
+  </div>
+
+  <div id="info">
+    <p>Puntaje: <span id="score">0</span></p>
+    <p>Tiempo restante: <span id="timer">30</span> segundos</p>
+  </div>
+
+  <!-- Modal -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <h2 id="resultTitle"></h2>
+      <p id="resultText"></p>
+      <button class="btn-restart" onclick="restartGame()">Volver a jugar</button>
+      <button class="btn-exit" onclick="exitGame()">Salir</button>
+    </div>
+  </div>
+
+  <script>
+    let firstSelected = null;
+    let score = 0;
+    let timeLeft = 30;
+    let timerInterval;
+    let correctCount = 0;
+    const totalPairs = 4;
+
+    function updateScore(points) {
+      score += points;
+      document.getElementById('score').textContent = score;
+    }
+
+    function startTimer() {
+      timeLeft = 30;
+      document.getElementById('timer').textContent = timeLeft;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          showResults("⏰ ¡Tiempo terminado!");
+        }
+      }, 1000);
+    }
+
+    function showResults(message) {
+      document.getElementById('resultTitle').textContent = message;
+      document.getElementById('resultText').textContent =
+        "Tu puntaje final es: " + score +
+        "\nAciertos: " + correctCount + " de " + totalPairs;
+      document.getElementById('resultModal').style.display = "block";
+    }
+
+    function checkEndGame() {
+      if (correctCount === totalPairs) {
+        clearInterval(timerInterval);
+        showResults("🎉 ¡Juego terminado!");
+      }
+    }
+
+    function restartGame() {
+      // Reiniciar variables
+      score = 0;
+      correctCount = 0;
+      document.getElementById('score').textContent = score;
+      document.getElementById('resultModal').style.display = "none";
+      // Reiniciar colores
+      document.querySelectorAll('.item').forEach(item => {
+        item.classList.remove('correct','wrong','selected');
+      });
+      // Reiniciar temporizador
+      clearInterval(timerInterval);
+      startTimer();
+    }
+
+    function exitGame() {
+      document.getElementById('resultModal').style.display = "none";
+      document.getElementById('game').innerHTML =
+        "<h2>Gracias por jugar 🎮</h2>";
+      document.getElementById('info').style.display = "none";
+    }
+
+    document.querySelectorAll('.item').forEach(item => {
+      item.addEventListener('click', () => {
+        if (!firstSelected) {
+          firstSelected = item;
+          item.classList.add('selected');
+        } else {
+          if (firstSelected.dataset.match === item.dataset.match &&
+              firstSelected.parentElement !== item.parentElement) {
+            firstSelected.classList.add('correct');
+            item.classList.add('correct');
+            updateScore(10);
+            correctCount++;
+            checkEndGame();
+          } else {
+            firstSelected.classList.add('wrong');
+            item.classList.add('wrong');
+            updateScore(-5);
+          }
+          firstSelected.classList.remove('selected');
+          firstSelected = null;
+        }
+      });
+    });
+
+    // Iniciar temporizador al cargar
+    startTimer();
+  </script>
+</body>
+</html>
