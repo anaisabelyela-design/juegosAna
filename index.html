@@ -13,13 +13,30 @@
     }
     h1 { color: #004080; margin: 15px; }
     .container {
-      display: flex; justify-content: center; flex-wrap: wrap; margin: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;   /* Responsive: columnas se acomodan */
+      margin: 20px;
     }
-    .column { margin: 10px; flex: 1; min-width: 150px; }
+    .column {
+      margin: 10px;
+      flex: 1;
+      min-width: 250px;
+    }
+    .column h2 {
+      text-align: center;
+      color: #004080;
+      margin-bottom: 10px;
+    }
     .item {
-      padding: 15px; margin: 8px; border: 2px solid #004080;
-      border-radius: 10px; cursor: pointer; background: #ffffff;
-      font-size: 18px; transition: 0.3s;
+      padding: 15px;
+      margin: 8px;
+      border: 2px solid #004080;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #ffffff;
+      font-size: 18px;
+      transition: 0.3s;
     }
     .item:hover { background: #e6f2ff; }
     .selected { background-color: #cce5ff; border-color: #3399ff; }
@@ -29,8 +46,9 @@
     #info span { font-weight: bold; }
     @media (max-width: 600px) {
       .item { font-size: 20px; padding: 20px; }
+      .column h2 { font-size: 22px; }
     }
-    /* Estilos para el modal */
+    /* Modal */
     .modal {
       display: none; position: fixed; z-index: 1; left: 0; top: 0;
       width: 100%; height: 100%; overflow: auto;
@@ -56,18 +74,18 @@
 
   <div class="container" id="game">
     <div class="column" id="col1">
-      <h2>Corregimiento</h2>
-      <div class="item" data-match="1">Cimarronas</div>
-      <div class="item" data-match="2">San Juan</div>
-      <div class="item" data-match="3">El Cármen</div>
-      <div class="item" data-match="4">Los Milagros</div>
+      <h2>Preguntas</h2>
+      <div class="item" data-match="1">Capital de Francia</div>
+      <div class="item" data-match="2">Capital de Colombia</div>
+      <div class="item" data-match="3">Capital de Japón</div>
+      <div class="item" data-match="4">Capital de España</div>
     </div>
     <div class="column" id="col2">
-      <h2>Fiesta Patronal</h2>
-      <div class="item" data-match="4">Vírgen de las Mercedes</div>
-      <div class="item" data-match="3">Vírgen del Cármen</div>
-      <div class="item" data-match="1">Vírgen de Fátima</div>
-      <div class="item" data-match="2">Nuestra Señora de los Remedios</div>
+      <h2>Respuestas</h2>
+      <div class="item" data-match="2">Bogotá</div>
+      <div class="item" data-match="3">Tokio</div>
+      <div class="item" data-match="1">París</div>
+      <div class="item" data-match="4">Madrid</div>
     </div>
   </div>
 
@@ -128,16 +146,13 @@
     }
 
     function restartGame() {
-      // Reiniciar variables
       score = 0;
       correctCount = 0;
       document.getElementById('score').textContent = score;
       document.getElementById('resultModal').style.display = "none";
-      // Reiniciar colores
       document.querySelectorAll('.item').forEach(item => {
         item.classList.remove('correct','wrong','selected');
       });
-      // Reiniciar temporizador
       clearInterval(timerInterval);
       startTimer();
     }
@@ -173,7 +188,6 @@
       });
     });
 
-    // Iniciar temporizador al cargar
     startTimer();
   </script>
 </body>
